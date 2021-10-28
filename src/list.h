@@ -77,10 +77,14 @@ public:
     }
 
 private:
+    using node_allocator_traits = typename std::allocator_traits<allocator>::template rebind_traits<node>;
+    using node_allocator_type = typename node_allocator_traits::allocator_type;
+    using node_pointer = typename node_allocator_traits::pointer;
+
     node*       head  = nullptr;
     std::size_t size_ = 0;
 
-    node_allocator node_alloc;
+    node_allocator_type node_alloc;
 };
 
 }
