@@ -48,8 +48,8 @@ public:
         while (head != nullptr) {
             auto tmp = head;
             head = head -> next;
-            node_alloc.destroy(tmp);
-            node_alloc.deallocate(tmp, 1);
+            node_traits::destroy(node_alloc, tmp);
+            node_traits::deallocate(node_alloc, tmp, 1);
         }
     };
 
@@ -62,8 +62,8 @@ public:
     }
 
     void add(const T& val) {
-        node* n = node_alloc.allocate(1);
-        node_alloc.construct(n, std::move(val), head);
+        node_pointer n = node_traits::allocate(node_alloc, 1);
+        node_traits::construct(node_alloc, n, std::move(val), head);
         head = n;
         size_++;
     }
@@ -77,13 +77,16 @@ public:
     }
 
 private:
-    using node_allocator_traits = typename std::allocator_traits<allocator>::template rebind_traits<node>;
-    using node_allocator_type = typename node_allocator_traits::allocator_type;
-    using node_pointer = typename node_allocator_traits::pointer;
+    using traits = std::allocator_traits<allocator>;
+    using pointer = typename traits::pointer;
+    using node_traits = typename std::allocator_traits<allocator>::template rebind_traits<node>;
+    using node_allocator_type = typename node_traits::allocator_type;
+    using node_pointer = typename node_traits::pointer;
 
     node*       head  = nullptr;
     std::size_t size_ = 0;
 
+    allocator alloc;
     node_allocator_type node_alloc;
 };
 
