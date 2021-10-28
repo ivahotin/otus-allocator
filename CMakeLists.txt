@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(03_allocator)
+project(allocator)
 
 enable_testing()
 
