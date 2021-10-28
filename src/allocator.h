@@ -7,7 +7,7 @@
 namespace custom {
 
 template <typename T, std::size_t TotalSize>
-class allocator : public std::allocator<T> {
+class allocator {
 public:
     using value_type = T;
     using pointer = T*;
@@ -29,9 +29,7 @@ private:
     }
 
 public:
-    allocator() {
-        init();
-    }
+    allocator() = default;
 
     ~allocator() {
         if (area != nullptr) {
@@ -45,6 +43,10 @@ public:
     };
 
     pointer allocate(std::size_t n) {
+        if (area == nullptr) {
+            init();
+        }
+
         if (TotalSize < n + allocated_size) {
             throw std::bad_alloc();
         }
@@ -82,6 +84,17 @@ public:
         }
 
         allocated_size -= n;
+    }
+
+    template <typename U, typename... Args>
+    void construct(U* p, Args&&... args)
+    {
+        new (p) U(std::forward<Args>(args)...);
+    }
+
+    void destroy(T* p)
+    {
+        p->~T();
     }
 };
 
